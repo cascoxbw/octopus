@@ -23,7 +23,7 @@ class octopus:
     def env(self):
         print("env set")
         oneapi = u.source(self.handbook['oneapi'])
-        oneapiIn = f"{oneapi} > silence.log"
+        oneapiIn = f"{oneapi} &> /dev/null"
         env = u.source(self.handbook['env'])
         u.execute(oneapiIn,env)
 

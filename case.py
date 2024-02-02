@@ -17,7 +17,7 @@ class case:
         self.intervalTrex = 30
         self.intervalCmd = 5
         self.intervalCase = 60
-        self.retry = 3
+        self.retry = 1
         self.result = 'fail'
         self.isPass = False
         self.trexCnsl = None
@@ -50,8 +50,8 @@ class case:
         else:
             print("du stop")
             l2 = u.cd(self.l2Path)
-            l21 = "./stopdu.sh > silence.log"
-            u.execute(l2,l21)
+            cmd = "./stopdu.sh &> /dev/null"
+            u.execute(l2,cmd)
 
     def trex(self,on):
         if on:
@@ -138,7 +138,9 @@ class case:
         u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['case_num'])
         self.trexCnsl = console
         self.input()
-        for i in range(0,self.retry):
+        for i in range(0,self.retry+1):
+            if i > 0:
+                u.fence('retry:',i,'/',self.retry)
             self.du(True)
             self.trex(True)
             u.sleep(self.intervalCase)
