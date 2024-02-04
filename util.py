@@ -15,7 +15,7 @@ class util:
                 cmd += args[i]
             else:
                 cmd += ';'+args[i]
-        print(cmd)
+        #print(cmd)
         subprocess.Popen(['bash', '-c', f'{cmd}'])
 
     def sleep(interval):

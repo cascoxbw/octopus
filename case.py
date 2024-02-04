@@ -16,7 +16,7 @@ class case:
         self.intervalDu = 15
         self.intervalTrex = 30
         self.intervalCmd = 5
-        self.intervalCase = 60
+        self.intervalCase = 30
         self.retry = 1
         self.result = 'fail'
         self.isPass = False
