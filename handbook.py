@@ -34,6 +34,6 @@ class handbook:
             print('load config error')
 
     def get(self):
-        print(self.handbook)
+        #print(self.handbook)
         return self.handbook
 

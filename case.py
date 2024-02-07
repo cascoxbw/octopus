@@ -66,7 +66,7 @@ class case:
             path = self.handbook['input'] + self.name + '/' + self.platform + '/'
             for para in self.trex_script_para:
                 self.trexCnsl.sendline(f"start -f {path}flow.py {para}")
-                print(f"start -f {path}flow.py {para}")
+                print("trex para: ",para)
                 u.sleep(self.intervalCmd)
             print("trex start")
         else:
