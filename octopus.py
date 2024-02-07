@@ -15,13 +15,13 @@ class octopus:
                     plat = 'SPR-EE'
                 else:
                     plat = 'ICX-SP'
-            print(plat)
+            print("platform: ",plat)
             return plat
         except:
             print('platform error')
         
     def env(self):
-        print("env set")
+        print("[env set]")
         oneapi = u.source(self.handbook['oneapi'])
         oneapiIn = f"{oneapi} &> /dev/null"
         env = u.source(self.handbook['env'])

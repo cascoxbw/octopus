@@ -30,13 +30,13 @@ class case:
         self.trexPath = self.handbook['trex']
 
     def uesim(self):
-        print("uesim start")
+        print("[uesim start]")
         uesim = u.cd(self.uesimPath)
         uesim1 = f"nohup ./uesim.sh > {self.uesimLog} 2>&1 &"
         u.execute(uesim,uesim1)
     
     def l2(self):
-        print("l2 start")
+        print("[l2 start]")
         l2 = u.cd(self.l2Path)
         l21 = f"nohup ./l2.sh > {self.l2Log} 2>&1 &"
         u.execute(l2,l21)
@@ -48,7 +48,7 @@ class case:
             self.l2()
             u.sleep(self.intervalDu)
         else:
-            print("du stop")
+            print("[du stop]")
             l2 = u.cd(self.l2Path)
             cmd = "./stopdu.sh &> /dev/null"
             u.execute(l2,cmd)
@@ -68,11 +68,11 @@ class case:
                 self.trexCnsl.sendline(f"start -f {path}flow.py {para}")
                 print("trex para: ",para)
                 u.sleep(self.intervalCmd)
-            print("trex start")
+            print("[trex start]")
         else:
             self.trexCnsl.sendline('stop')
             u.sleep(self.intervalCmd)
-            print("trex stop")
+            print("[trex stop]")
 
     def check(self):
         if os.path.exists(self.uesimPath + self.uesimLog)\
