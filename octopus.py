@@ -5,20 +5,19 @@ from case import case
 class octopus:
     def __init__(self):
         self.handbook = handbook().get()
-        self.plat = self.platform()
         self.case_list = self.load()
 
-    def platform(self):
-        try:
-            with open(self.handbook['env'], 'r') as file:
-                if 'spr' in file.read():
-                    plat = 'SPR-EE'
-                else:
-                    plat = 'ICX-SP'
-            print("platform: ",plat)
-            return plat
-        except:
-            print('platform error')
+    # def platform(self):
+    #     try:
+    #         with open(self.handbook['env'], 'r') as file:
+    #             if 'spr' in file.read():
+    #                 plat = 'SPR-EE'
+    #             else:
+    #                 plat = 'ICX-SP'
+    #         print("platform: ",plat)
+    #         return plat
+    #     except:
+    #         print('platform error')
         
     def env(self):
         print("[env set]")
@@ -28,10 +27,16 @@ class octopus:
         u.execute(oneapiIn,env)
 
     def load(self):
-        return [case(id,self.handbook,self.plat) for id in range(0,self.handbook['case_num'])]
+        if self.handbook['is_flex']:
+            return [case(id,self.handbook) for id in self.handbook['flex']]
+        else:
+            return [case(id,self.handbook) for id in range(0,self.handbook['active_case_num'])]
 
     def check(self):
         u.fence('summary')
+        print("platform: ",self.handbook['platform'])
+        print("algo: ",self.handbook['algo'])
+
         passCount = 0
         failCount = 0
         for case in self.case_list:
@@ -40,7 +45,7 @@ class octopus:
                 passCount+=1
             else:
                 failCount+=1
-        u.fence('total:',self.handbook['case_num'],'pass:',passCount,'fail:',failCount)
+        u.fence('total:',self.handbook['active_case_num'],'pass:',passCount,'fail:',failCount)
 
     def execute(self):
         self.env()

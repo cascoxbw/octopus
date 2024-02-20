@@ -23,10 +23,20 @@ class handbook:
 
             case_num = self.cp.getint('case', 'case_num')
             handbook['case_num'] = case_num
+            handbook['active_case_num'] = case_num
             
             handbook['case_list'] = [{'name':self.cp['case.'+str(i)]['name'],
                                       'trex_script_para':[para for para in self.cp['case.'+str(i)]['trex_script_para'].split(',')]} 
                                       for i in range(0,case_num)]
+            
+            handbook['platform'] = self.cp['case']['platform']
+
+            handbook['is_flex'] = self.cp.getboolean('case', 'is_flex')
+            handbook['flex'] = [int(id) for id in self.cp['case']['flex'].split(',')]
+            if handbook['is_flex']:
+                handbook['active_case_num'] = len(handbook['flex'])
+
+            handbook['algo'] = self.cp['case']['algo']
 
             handbook['output'] = self.cp['path']['output']
             return handbook

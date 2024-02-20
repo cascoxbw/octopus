@@ -5,10 +5,11 @@ import psutil
 from util import util as u
 
 class case:
-    def __init__(self,id,config,platform):
+    def __init__(self,id,config):
         self.id = id
         self.handbook = config
-        self.platform = platform
+        self.platform = self.handbook['platform']
+        self.algo = self.handbook['algo']
 
         self.name = self.handbook['case_list'][self.id]['name']
         self.trex_script_para = self.handbook['case_list'][self.id]['trex_script_para']
@@ -28,6 +29,12 @@ class case:
         self.uesimPath = self.handbook['uesim']
         self.l2Path = self.handbook['nr5g']
         self.trexPath = self.handbook['trex']
+
+    def getInputPath(self):
+        return self.handbook['input'] + self.platform + '/' + self.name + '/' + self.algo + '/'
+
+    def getOutputPath(self):
+        return self.handbook['output'] + self.platform + '/' + self.name + '/' + self.algo + '/' + u.timestamp()
 
     def uesim(self):
         print("[uesim start]")
@@ -63,7 +70,7 @@ class case:
                 self.trexCnsl = pexpect.spawn("./trex-console")
                 u.sleep(self.intervalCmd)
 
-            path = self.handbook['input'] + self.name + '/' + self.platform + '/'
+            path = self.getInputPath()
             for para in self.trex_script_para:
                 self.trexCnsl.sendline(f"start -f {path}flow.py {para}")
                 print("trex para: ",para)
@@ -85,7 +92,7 @@ class case:
             self.result = 'fail'
 
     def output(self):
-        path = self.handbook['output'] + self.name + "_" + u.timestamp()
+        path = self.getOutputPath()
         print("output to: ", path)
         try:
             os.makedirs(path)
@@ -96,7 +103,7 @@ class case:
             print("output error")
 
     def input(self):
-        path = self.handbook['input'] + self.name + '/' + self.platform + '/'
+        path = self.getInputPath()
         print("input from: ", path)
         try:
             shutil.copy2(os.path.join(path, "uesimcfg.xml"), self.uesimPath)
@@ -136,7 +143,7 @@ class case:
         self.cleanTrex()
 
     def execute(self,console):
-        u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['case_num'])
+        u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['active_case_num'])
         self.trexCnsl = console
         self.input()
         for i in range(0,self.retry+1):
