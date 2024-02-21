@@ -5,24 +5,33 @@ import psutil
 from util import util as u
 
 class case:
-    def __init__(self,id,config):
-        self.id = id
-        self.handbook = config
-        self.platform = self.handbook['platform']
-        self.algo = self.handbook['algo']
+    def __init__(self,id,handbook):
+        self.handbook = handbook
 
+        self.initProp(id)
+        self.initCtrl()
+        self.initKeyword()
+
+    def initProp(self,id):
+        self.platform = self.handbook['platform']
+        self.id = id
         self.name = self.handbook['case_list'][self.id]['name']
         self.trex_script_para = self.handbook['case_list'][self.id]['trex_script_para']
-
+        self.algo = self.handbook['case_list'][self.id]['algo']
+        if self.handbook['is_global_algo']:
+            self.algo = self.handbook['global_algo']
+    
+    def initCtrl(self):
         self.intervalDu = 15
         self.intervalTrex = 30
         self.intervalCmd = 5
         self.intervalCase = 30
-        self.retry = 1
+        self.retry = self.handbook['retry']
         self.result = 'fail'
         self.isPass = False
         self.trexCnsl = None
 
+    def initKeyword(self):
         self.uesimLog = 'uesimlog.txt'
         self.l2Log = 'l2log.txt'
         self.l2stats = 'l23_timing_stats.txt'
@@ -73,7 +82,7 @@ class case:
             path = self.getInputPath()
             for para in self.trex_script_para:
                 self.trexCnsl.sendline(f"start -f {path}flow.py {para}")
-                print("trex para: ",para)
+                print("trex para:",para)
                 u.sleep(self.intervalCmd)
             print("[trex start]")
         else:
@@ -93,7 +102,7 @@ class case:
 
     def output(self):
         path = self.getOutputPath()
-        print("output to: ", path)
+        print("output to:", path)
         try:
             os.makedirs(path)
             shutil.move(f"{self.uesimPath+self.uesimLog}", path)
@@ -104,7 +113,7 @@ class case:
 
     def input(self):
         path = self.getInputPath()
-        print("input from: ", path)
+        print("input from:", path)
         try:
             shutil.copy2(os.path.join(path, "uesimcfg.xml"), self.uesimPath)
             shutil.copy2(os.path.join(path, "cell1.xml"), self.l2Path)
@@ -121,29 +130,11 @@ class case:
         except:
             print('clean du error')
         #print('clean du')
-
-    def cleanTrex(self):
-        if self.trexCnsl != None:
-            self.trexCnsl.sendline('stop')
-            u.sleep(self.intervalCmd)
-            self.trexCnsl.sendline('quit')
-            self.trexCnsl.expect(pexpect.EOF)
-            self.trexCnsl = None
-        try:
-            for proc in psutil.process_iter():
-                pname = proc.name()
-                if '_t-rex-64' in pname:
-                    proc.terminate()
-        except:
-            print('clean trex error')
-        #print('clean trex')
-
-    def clean(self):
-        self.cleanDu()
-        self.cleanTrex()
-
+            
     def execute(self,console):
         u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['active_case_num'])
+        print("algo:",self.algo)
+
         self.trexCnsl = console
         self.input()
         for i in range(0,self.retry+1):
@@ -159,7 +150,7 @@ class case:
             if self.isPass:
                 self.output()
                 break
-        #self.cleanTrex()
+
         u.fence('case:',self.name,'result:',self.result)
         return self.trexCnsl
 
