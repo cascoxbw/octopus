@@ -7,7 +7,6 @@ from util import util as u
 class case:
     def __init__(self,id,handbook):
         self.handbook = handbook
-
         self.initProp(id)
         self.initCtrl()
         self.initKeyword()
@@ -40,10 +39,10 @@ class case:
         self.trexPath = self.handbook['trex']
 
     def getInputPath(self):
-        return self.handbook['input'] + self.platform + '/' + self.name + '/' + self.algo + '/'
+        return os.path.join(self.handbook['input'],self.platform,self.name,self.algo)
 
     def getOutputPath(self):
-        return self.handbook['output'] + self.platform + '/' + self.name + '/' + self.algo + '/' + u.timestamp()
+        return os.path.join(self.handbook['output'],self.platform,self.name,self.algo,u.timestamp())
 
     def uesim(self):
         print("[uesim start]")

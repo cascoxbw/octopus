@@ -15,6 +15,7 @@ class handbook:
             handbook['env'] = self.cp['path']['env']
             handbook['trex'] = self.cp['path']['trex']
 
+            handbook['du'] = self.cp['path']['du']
             handbook['uesim'] = self.cp['path']['uesim']
             handbook['nr5g'] = self.cp['path']['nr5g']
             handbook['input'] = self.cp['path']['input']

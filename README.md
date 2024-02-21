@@ -1,5 +1,9 @@
 # octopus
 for mu benchmark
 
-1. modify handbook.ini
-2. python octopus.py
+requirements:
+    GitPython
+
+1. pip install GitPython
+2. modify handbook.ini
+3. python octopus.py

@@ -1,8 +1,10 @@
+import os
 import pexpect
 import psutil
 from handbook import handbook
 from util import util as u
 from case import case
+from git import Repo
 
 class octopus:
     def __init__(self):
@@ -77,9 +79,16 @@ class octopus:
             print('clean trex error')
         #print('clean trex')
 
+    def cleanGit(self):
+        repo = Repo(self.handbook['du'])
+        repo.index.checkout(os.path.join(self.handbook['uesim'], "uesimcfg.xml"), force=True)
+        repo.index.checkout(os.path.join(self.handbook['nr5g'], "cell1.xml"), force=True)
+        repo.index.checkout(os.path.join(self.handbook['nr5g'], "maccfg.xml"), force=True)
+    
     def clean(self,trexCnsl):
         self.cleanDu()
         self.cleanTrex(trexCnsl)
+        self.cleanGit()
 
     def execute(self):
         self.env()
