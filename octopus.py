@@ -52,11 +52,11 @@ class octopus:
         passCount = 0
         failCount = 0
         for case in self.case_list:
-            print(f'{case.name}: {case.result}')
-            if case.isPass:
+            if case.result[0]:
                 passCount+=1
             else:
                 failCount+=1
+            print(f'{case.name}: {case.result[1]}')
         
         u.fence('total:',self.handbook['active_case_num'],'pass:',passCount,'fail:',failCount)
 
@@ -106,7 +106,8 @@ class octopus:
             console = case.execute(console)
         self.clean(console)
         self.check()
-        self.ht(True)
+        if self.handbook['ht'] == False:
+            self.ht(True)
 
 
 

@@ -26,8 +26,7 @@ class case:
         self.intervalCmd = 5
         self.intervalCase = 30
         self.retry = self.handbook['retry']
-        self.result = 'fail'
-        self.isPass = False
+        self.result = (False,'fail')
         self.trexCnsl = None
 
     def initKeyword(self):
@@ -46,15 +45,15 @@ class case:
 
     def uesim(self):
         print('[uesim start]')
-        uesim = u.cd(self.uesimPath)
-        uesim1 = f'nohup ./uesim.sh > {self.uesimLog} 2>&1 &'
-        u.execute(uesim,uesim1)
+        cd = u.cd(self.uesimPath)
+        cmd = f'nohup ./uesim.sh > {self.uesimLog} 2>&1 &'
+        u.execute(cd,cmd)
     
     def l2(self):
         print('[l2 start]')
-        l2 = u.cd(self.l2Path)
-        l21 = f'nohup ./l2.sh > {self.l2Log} 2>&1 &'
-        u.execute(l2,l21)
+        cd = u.cd(self.l2Path)
+        cmd = f'nohup ./l2.sh > {self.l2Log} 2>&1 &'
+        u.execute(cd,cmd)
 
     def du(self,on):
         if on:
@@ -64,9 +63,9 @@ class case:
             u.sleep(self.intervalDu)
         else:
             print('[du stop]')
-            l2 = u.cd(self.l2Path)
+            cd = u.cd(self.l2Path)
             cmd = './stopdu.sh &> /dev/null'
-            u.execute(l2,cmd)
+            u.execute(cd,cmd)
 
     def trex(self,on):
         if on:
@@ -90,14 +89,10 @@ class case:
             print('[trex stop]')
 
     def check(self):
-        if os.path.exists(self.uesimPath + self.uesimLog)\
-            and os.path.exists(self.l2Path + self.l2Log)\
-              and os.path.exists(self.l2Path + self.l2stats):
-            self.isPass = True
-            self.result = 'pass'
-        else:
-            self.isPass = False
-            self.result = 'fail'
+        cond = os.path.exists(self.uesimPath + self.uesimLog)\
+               and os.path.exists(self.l2Path + self.l2Log)\
+               and os.path.exists(self.l2Path + self.l2stats)
+        self.result = (True,'pass') if cond else (False,'fail')
 
     def output(self):
         path = self.getOutputPath()
@@ -146,10 +141,10 @@ class case:
             self.trex(False)
             self.check()
             self.cleanDu()
-            if self.isPass:
+            if self.result[0]:
                 self.output()
                 break
 
-        u.fence('case:',self.name,'result:',self.result)
+        u.fence('case:',self.name,'result:',self.result[1])
         return self.trexCnsl
 
