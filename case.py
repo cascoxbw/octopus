@@ -1,5 +1,6 @@
 import os
 import shutil
+from git import Repo
 import pexpect
 import psutil
 from util import util as u
@@ -30,12 +31,9 @@ class case:
         self.trexCnsl = None
 
     def initKeyword(self):
-        self.uesimLog = 'uesimlog.txt'
-        self.l2Log = 'l2log.txt'
-        self.l2stats = 'l23_timing_stats.txt'
-        self.uesimPath = self.handbook['uesim']
-        self.l2Path = self.handbook['nr5g']
-        self.trexPath = self.handbook['trex']
+        self.uesimKw = (self.handbook['uesim'],'./uesim.sh','uesimcfg.xml','uesimlog.txt','uesim')
+        self.l2Kw = (self.handbook['nr5g'],'./l2.sh','./stopdu.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
+        self.trexKw = (self.handbook['trex'],'./t-rex-64 -i','./trex-console','stop','quit','_t-rex-64')
 
     def getInputPath(self):
         return os.path.join(self.handbook['input'],self.platform,self.name,self.algo)
@@ -45,14 +43,14 @@ class case:
 
     def uesim(self):
         print('[uesim start]')
-        cd = u.cd(self.uesimPath)
-        cmd = f'nohup ./uesim.sh > {self.uesimLog} 2>&1 &'
+        cd = u.cd(self.uesimKw[0])
+        cmd = f'nohup {self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &'
         u.execute(cd,cmd)
     
     def l2(self):
         print('[l2 start]')
-        cd = u.cd(self.l2Path)
-        cmd = f'nohup ./l2.sh > {self.l2Log} 2>&1 &'
+        cd = u.cd(self.l2Kw[0])
+        cmd = f'nohup {self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &'
         u.execute(cd,cmd)
 
     def du(self,on):
@@ -63,18 +61,17 @@ class case:
             u.sleep(self.intervalDu)
         else:
             print('[du stop]')
-            cd = u.cd(self.l2Path)
-            cmd = './stopdu.sh &> /dev/null'
+            cd = u.cd(self.l2Kw[0])
+            cmd = f'{self.l2Kw[2]} &> /dev/null'
             u.execute(cd,cmd)
 
     def trex(self,on):
         if on:
             if self.trexCnsl is None:
-                os.chdir(self.trexPath)
-                os.system('./t-rex-64 -i > server.log 2>&1 &')
+                os.chdir(self.trexKw[0])
+                os.system(f'{self.trexKw[1]} > server.log 2>&1 &')
                 u.sleep(self.intervalTrex)
-                os.chdir(self.trexPath)
-                self.trexCnsl = pexpect.spawn('./trex-console')
+                self.trexCnsl = pexpect.spawn(self.trexKw[2])
                 u.sleep(self.intervalCmd)
 
             path = self.getInputPath()
@@ -89,9 +86,9 @@ class case:
             print('[trex stop]')
 
     def check(self):
-        cond = os.path.exists(self.uesimPath + self.uesimLog)\
-               and os.path.exists(self.l2Path + self.l2Log)\
-               and os.path.exists(self.l2Path + self.l2stats)
+        cond = os.path.exists(os.path.join(self.uesimKw[0],self.uesimKw[3]))\
+               and os.path.exists(os.path.join(self.l2Kw[0],self.l2Kw[5]))\
+               and os.path.exists(os.path.join(self.l2Kw[0],self.l2Kw[6]))
         self.result = (True,'pass') if cond else (False,'fail')
 
     def output(self):
@@ -99,9 +96,9 @@ class case:
         print('output to:', path)
         try:
             os.makedirs(path)
-            shutil.move(f'{self.uesimPath+self.uesimLog}', path)
-            shutil.move(f'{self.l2Path+self.l2Log}', path)
-            shutil.move(f'{self.l2Path+self.l2stats}', path)
+            shutil.move(os.path.join(self.uesimKw[0],self.uesimKw[3]), path)
+            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[5]), path)
+            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[6]), path)
         except:
             print('output error')
 
@@ -109,9 +106,9 @@ class case:
         path = self.getInputPath()
         print('input from:', path)
         try:
-            shutil.copy2(os.path.join(path, 'uesimcfg.xml'), self.uesimPath)
-            shutil.copy2(os.path.join(path, 'cell1.xml'), self.l2Path)
-            shutil.copy2(os.path.join(path, 'maccfg.xml'), self.l2Path)
+            shutil.copy2(os.path.join(path, self.uesimKw[2]), self.uesimKw[0])
+            shutil.copy2(os.path.join(path, self.l2Kw[3]), self.l2Kw[0])
+            shutil.copy2(os.path.join(path, self.l2Kw[4]), self.l2Kw[0])
         except:
             print('input error')
 
@@ -119,12 +116,39 @@ class case:
         try:
             for proc in psutil.process_iter():
                 pname = proc.name()
-                if 'uesim' in pname or 'l2app' in pname:
+                if self.uesimKw[-1] in pname or self.l2Kw[-1] in pname:
                     proc.terminate()
         except:
             print('clean du error')
         #print('clean du')
-            
+    
+    def cleanTrex(self):
+        if self.trexCnsl != None:
+            self.trexCnsl.sendline(self.trexKw[3])
+            u.sleep(self.intervalCmd)
+            self.trexCnsl.sendline(self.trexKw[4])
+            self.trexCnsl.expect(pexpect.EOF)
+            self.trexCnsl = None
+        try:
+            for proc in psutil.process_iter():
+                pname = proc.name()
+                if self.trexKw[-1] in pname:
+                    proc.terminate()
+        except:
+            print('clean trex error')
+        #print('clean trex')
+
+    def cleanGit(self):
+        repo = Repo(self.handbook['du'])
+        repo.index.checkout(os.path.join(self.uesimKw[0], self.uesimKw[2]), force=True)
+        repo.index.checkout(os.path.join(self.l2Kw[0], self.l2Kw[3]), force=True)
+        repo.index.checkout(os.path.join(self.l2Kw[0], self.l2Kw[4]), force=True)
+    
+    def clean(self):
+        self.cleanDu()
+        self.cleanTrex()
+        self.cleanGit()
+
     def execute(self,console):
         u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['active_case_num'])
         print('algo:',self.algo)

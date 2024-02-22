@@ -1,10 +1,6 @@
-import os
-import pexpect
-import psutil
 from handbook import handbook
 from util import util as u
 from case import case
-from git import Repo
 
 class octopus:
     def __init__(self):
@@ -60,51 +56,14 @@ class octopus:
         
         u.fence('total:',self.handbook['active_case_num'],'pass:',passCount,'fail:',failCount)
 
-    def cleanDu(self):
-        try:
-            for proc in psutil.process_iter():
-                pname = proc.name()
-                if 'uesim' in pname or 'l2app' in pname:
-                    proc.terminate()
-        except:
-            print('clean du error')
-        #print('clean du')
-
-    def cleanTrex(self,trexCnsl):
-        if trexCnsl != None:
-            trexCnsl.sendline('stop')
-            u.sleep(self.intervalCmd)
-            trexCnsl.sendline('quit')
-            trexCnsl.expect(pexpect.EOF)
-            trexCnsl = None
-        try:
-            for proc in psutil.process_iter():
-                pname = proc.name()
-                if '_t-rex-64' in pname:
-                    proc.terminate()
-        except:
-            print('clean trex error')
-        #print('clean trex')
-
-    def cleanGit(self):
-        repo = Repo(self.handbook['du'])
-        repo.index.checkout(os.path.join(self.handbook['uesim'], 'uesimcfg.xml'), force=True)
-        repo.index.checkout(os.path.join(self.handbook['nr5g'], 'cell1.xml'), force=True)
-        repo.index.checkout(os.path.join(self.handbook['nr5g'], 'maccfg.xml'), force=True)
-    
-    def clean(self,trexCnsl):
-        self.cleanDu()
-        self.cleanTrex(trexCnsl)
-        self.cleanGit()
-
     def execute(self):
         self.env()
         self.ht(self.handbook['ht'])
         console = None
-        self.clean(console)
+        self.case_list[0].clean()
         for case in self.case_list:
             console = case.execute(console)
-        self.clean(console)
+        self.case_list[-1].clean()
         self.check()
         if self.handbook['ht'] == False:
             self.ht(True)
