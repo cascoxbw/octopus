@@ -22,7 +22,7 @@ class util:
         time.sleep(interval)
 
     def timestamp():
-        return time.strftime("%Y%m%d%H%M%S", time.localtime())
+        return time.strftime('%Y%m%d%H%M%S', time.localtime())
     
     def fence(*args):
         left = '###############'

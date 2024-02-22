@@ -45,15 +45,15 @@ class case:
         return os.path.join(self.handbook['output'],self.platform,self.name,self.algo,u.timestamp())
 
     def uesim(self):
-        print("[uesim start]")
+        print('[uesim start]')
         uesim = u.cd(self.uesimPath)
-        uesim1 = f"nohup ./uesim.sh > {self.uesimLog} 2>&1 &"
+        uesim1 = f'nohup ./uesim.sh > {self.uesimLog} 2>&1 &'
         u.execute(uesim,uesim1)
     
     def l2(self):
-        print("[l2 start]")
+        print('[l2 start]')
         l2 = u.cd(self.l2Path)
-        l21 = f"nohup ./l2.sh > {self.l2Log} 2>&1 &"
+        l21 = f'nohup ./l2.sh > {self.l2Log} 2>&1 &'
         u.execute(l2,l21)
 
     def du(self,on):
@@ -63,31 +63,31 @@ class case:
             self.l2()
             u.sleep(self.intervalDu)
         else:
-            print("[du stop]")
+            print('[du stop]')
             l2 = u.cd(self.l2Path)
-            cmd = "./stopdu.sh &> /dev/null"
+            cmd = './stopdu.sh &> /dev/null'
             u.execute(l2,cmd)
 
     def trex(self,on):
         if on:
             if self.trexCnsl is None:
                 os.chdir(self.trexPath)
-                os.system("./t-rex-64 -i > server.log 2>&1 &")
+                os.system('./t-rex-64 -i > server.log 2>&1 &')
                 u.sleep(self.intervalTrex)
                 os.chdir(self.trexPath)
-                self.trexCnsl = pexpect.spawn("./trex-console")
+                self.trexCnsl = pexpect.spawn('./trex-console')
                 u.sleep(self.intervalCmd)
 
             path = self.getInputPath()
             for para in self.trex_script_para:
-                self.trexCnsl.sendline(f"start -f {path}flow.py {para}")
-                print("trex para:",para)
+                self.trexCnsl.sendline(f'start -f {path}flow.py {para}')
+                print('trex para:',para)
                 u.sleep(self.intervalCmd)
-            print("[trex start]")
+            print('[trex start]')
         else:
             self.trexCnsl.sendline('stop')
             u.sleep(self.intervalCmd)
-            print("[trex stop]")
+            print('[trex stop]')
 
     def check(self):
         if os.path.exists(self.uesimPath + self.uesimLog)\
@@ -101,24 +101,24 @@ class case:
 
     def output(self):
         path = self.getOutputPath()
-        print("output to:", path)
+        print('output to:', path)
         try:
             os.makedirs(path)
-            shutil.move(f"{self.uesimPath+self.uesimLog}", path)
-            shutil.move(f"{self.l2Path+self.l2Log}", path)
-            shutil.move(f"{self.l2Path+self.l2stats}", path)
+            shutil.move(f'{self.uesimPath+self.uesimLog}', path)
+            shutil.move(f'{self.l2Path+self.l2Log}', path)
+            shutil.move(f'{self.l2Path+self.l2stats}', path)
         except:
-            print("output error")
+            print('output error')
 
     def input(self):
         path = self.getInputPath()
-        print("input from:", path)
+        print('input from:', path)
         try:
-            shutil.copy2(os.path.join(path, "uesimcfg.xml"), self.uesimPath)
-            shutil.copy2(os.path.join(path, "cell1.xml"), self.l2Path)
-            shutil.copy2(os.path.join(path, "maccfg.xml"), self.l2Path)
+            shutil.copy2(os.path.join(path, 'uesimcfg.xml'), self.uesimPath)
+            shutil.copy2(os.path.join(path, 'cell1.xml'), self.l2Path)
+            shutil.copy2(os.path.join(path, 'maccfg.xml'), self.l2Path)
         except:
-            print("input error")
+            print('input error')
 
     def cleanDu(self):
         try:
@@ -132,7 +132,7 @@ class case:
             
     def execute(self,console):
         u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['active_case_num'])
-        print("algo:",self.algo)
+        print('algo:',self.algo)
 
         self.trexCnsl = console
         self.input()

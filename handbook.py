@@ -19,6 +19,7 @@ class handbook:
             handbook['uesim'] = self.cp['path']['uesim']
             handbook['nr5g'] = self.cp['path']['nr5g']
             handbook['input'] = self.cp['path']['input']
+            handbook['output'] = self.cp['path']['output']
 
             case_num = self.cp.getint('case', 'case_num')
             handbook['case_num'] = case_num
@@ -37,11 +38,13 @@ class handbook:
                 handbook['active_case_num'] = len(handbook['flex'])
 
             handbook['is_global_algo'] = self.cp.getboolean('case.algo', 'enable')
-            handbook['global_algo'] = self.cp['case.algo']['name']
+            if handbook['is_global_algo']:
+                handbook['global_algo'] = self.cp['case.algo']['name']
 
             handbook['retry'] = self.cp.getint('case', 'retry_num')
-            
-            handbook['output'] = self.cp['path']['output']
+
+            handbook['ht'] = self.cp.getboolean('case', 'ht')
+
             return handbook
         except:
             print('load handbook error')

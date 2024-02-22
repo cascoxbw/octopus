@@ -19,15 +19,21 @@ class octopus:
     #                 plat = 'SPR-EE'
     #             else:
     #                 plat = 'ICX-SP'
-    #         print("platform:",plat)
+    #         print('platform:',plat)
     #         return plat
     #     except:
     #         print('platform error')
+    
+    def ht(self, on):
+        cmd = 'online' if on else 'offline'
+        print(f'[ht {cmd}]')
+        u.execute(f'./ht_onoffline.sh {cmd} &> /dev/null')
+        u.sleep(self.intervalCmd)
         
     def env(self):
-        print("[env set]")
+        print('[env set]')
         oneapi = u.source(self.handbook['oneapi'])
-        oneapiIn = f"{oneapi} &> /dev/null"
+        oneapiIn = f'{oneapi} &> /dev/null'
         env = u.source(self.handbook['env'])
         u.execute(oneapiIn,env)
 
@@ -39,14 +45,14 @@ class octopus:
 
     def check(self):
         u.fence('summary')
-        print("platform:",self.handbook['platform'])
+        print('platform:',self.handbook['platform'])
         if self.handbook['is_global_algo']:
-            print("global algo:",self.handbook['global_algo'])
+            print('global algo:',self.handbook['global_algo'])
 
         passCount = 0
         failCount = 0
         for case in self.case_list:
-            print(f"{case.name}: {case.result}")
+            print(f'{case.name}: {case.result}')
             if case.isPass:
                 passCount+=1
             else:
@@ -82,9 +88,9 @@ class octopus:
 
     def cleanGit(self):
         repo = Repo(self.handbook['du'])
-        repo.index.checkout(os.path.join(self.handbook['uesim'], "uesimcfg.xml"), force=True)
-        repo.index.checkout(os.path.join(self.handbook['nr5g'], "cell1.xml"), force=True)
-        repo.index.checkout(os.path.join(self.handbook['nr5g'], "maccfg.xml"), force=True)
+        repo.index.checkout(os.path.join(self.handbook['uesim'], 'uesimcfg.xml'), force=True)
+        repo.index.checkout(os.path.join(self.handbook['nr5g'], 'cell1.xml'), force=True)
+        repo.index.checkout(os.path.join(self.handbook['nr5g'], 'maccfg.xml'), force=True)
     
     def clean(self,trexCnsl):
         self.cleanDu()
@@ -93,12 +99,14 @@ class octopus:
 
     def execute(self):
         self.env()
+        self.ht(self.handbook['ht'])
         console = None
         self.clean(console)
         for case in self.case_list:
             console = case.execute(console)
         self.clean(console)
         self.check()
+        self.ht(True)
 
 
 
@@ -110,5 +118,5 @@ class octopus:
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     octopus().execute()
