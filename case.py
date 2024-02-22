@@ -10,7 +10,7 @@ class case:
         self.handbook = handbook
         self.initProp(id)
         self.initCtrl()
-        self.initKeyword()
+        self.initKw()
 
     def initProp(self,id):
         self.platform = self.handbook['platform']
@@ -30,7 +30,7 @@ class case:
         self.result = (False,'fail')
         self.trexCnsl = None
 
-    def initKeyword(self):
+    def initKw(self):
         self.uesimKw = (self.handbook['uesim'],'./uesim.sh','uesimcfg.xml','uesimlog.txt','uesim')
         self.l2Kw = (self.handbook['nr5g'],'./l2.sh','./stopdu.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
         self.trexKw = (self.handbook['trex'],'./t-rex-64 -i','./trex-console','stop','quit','_t-rex-64')
