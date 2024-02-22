@@ -20,7 +20,7 @@ class octopus:
     #     except:
     #         print('platform error')
     
-    def ht(self, on):
+    def ht(self,on):
         cmd = 'online' if on else 'offline'
         print(f'[ht {cmd}]')
         u.execute(f'./ht_onoffline.sh {cmd} &> /dev/null')
