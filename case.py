@@ -34,7 +34,7 @@ class case:
     def initKw(self):
         self.uesimKw = (self.handbook['uesim'],'./uesim.sh','uesimcfg.xml','uesimlog.txt','uesim')
         self.l2Kw = (self.handbook['nr5g'],'./l2.sh','./stopdu.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
-        self.trexKw = (self.handbook['trex'],'./t-rex-64 -i','./trex-console','stop','quit','_t-rex-64')
+        self.trexKw = (self.handbook['trex'],'./t-rex-64 -i','./trex-console','stop','quit','flow.py','_t-rex-64')
 
     def getInputPath(self):
         return os.path.join(self.handbook['input'],self.platform,self.name)
@@ -70,19 +70,20 @@ class case:
         if on:
             if self.trexCnsl is None:
                 os.chdir(self.trexKw[0])
-                os.system(f'{self.trexKw[1]} > server.log 2>&1 &')
+                os.system(f'{self.trexKw[1]} > null.log 2>&1 &')
                 u.sleep(self.intervalTrex)
                 self.trexCnsl = pexpect.spawn(self.trexKw[2])
                 u.sleep(self.intervalCmd)
 
-            path = self.getInputPath()
+            script = os.path.join(self.getInputPath(),self.trexKw[5])
             for para in self.trex_script_para:
-                self.trexCnsl.sendline(f'start -f {path}flow.py {para}')
-                print('trex para:',para)
+                cmd = f'start -f {script} {para}'
+                self.trexCnsl.sendline(cmd)
+                print('trex para:',cmd)
                 u.sleep(self.intervalCmd)
             print('[trex start]')
         else:
-            self.trexCnsl.sendline('stop')
+            self.trexCnsl.sendline(self.trexKw[3])
             u.sleep(self.intervalCmd)
             print('[trex stop]')
 
