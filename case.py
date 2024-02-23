@@ -106,15 +106,15 @@ class case:
 
     def injectAlgo(self):
         idMap = {'su':'0','zfs':'1','bfs':'2','cus':'3'}
-        subbandMap = {'su':'1','zfs':'3','bfs':'1','cus':'1'}
+        # subbandMap = {'su':'1','zfs':'3','bfs':'1','cus':'1'}
         dst = os.path.join(self.l2Kw[0],self.l2Kw[3])
         try:
             tree = ET.parse(dst)
             root = tree.getroot()
             for algo in root.iter('nMimoMode'):
                 algo.text = idMap[self.algo]
-            for sb in root.iter('nSubBand'):
-                sb.text = subbandMap[self.algo]
+            # for sb in root.iter('nSubBand'):
+            #     sb.text = subbandMap[self.algo]
             tree.write(dst)
         except Exception as e:
             print('inject algo error:',e)

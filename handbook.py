@@ -27,7 +27,7 @@ class handbook:
             
             handbook['case_list'] = [{'name':self.cp['case.'+str(i)]['name'],
                                       'trex_script_para':[para for para in self.cp['case.'+str(i)]['trex_script_para'].split(',')],
-                                      'algo':self.cp['case.'+str(i)]['algo']} 
+                                      'algo':self.cp['case.'+str(i)]['dl_algo']} 
                                       for i in range(0,case_num)]
             
             handbook['platform'] = self.cp['case']['platform']
@@ -39,7 +39,7 @@ class handbook:
 
             handbook['is_global_algo'] = self.cp.getboolean('case.algo', 'enable')
             if handbook['is_global_algo']:
-                handbook['global_algo'] = self.cp['case.algo']['name']
+                handbook['global_algo'] = self.cp['case.algo']['dl']
 
             handbook['retry'] = self.cp.getint('case', 'retry_num')
 
