@@ -133,14 +133,20 @@ class case:
             print('input error')
 
     def cleanDu(self):
-        try:
+        try:        
+            # rm = [os.path.join(self.uesimKw[0],self.uesimKw[3]),
+            #       os.path.join(self.l2Kw[0],self.l2Kw[5]),
+            #       os.path.join(self.l2Kw[0],self.l2Kw[6])]
+            # for i in rm:
+            #     if os.path.exists(i):
+            #         os.remove(i)
+        
             for proc in psutil.process_iter():
                 pname = proc.name()
                 if self.uesimKw[-1] in pname or self.l2Kw[-1] in pname:
                     proc.terminate()
         except:
             print('clean du error')
-        #print('clean du')
     
     def cleanTrex(self):
         if self.trexCnsl != None:
@@ -149,6 +155,7 @@ class case:
             self.trexCnsl.sendline(self.trexKw[4])
             self.trexCnsl.expect(pexpect.EOF)
             self.trexCnsl = None
+
         try:
             for proc in psutil.process_iter():
                 pname = proc.name()
@@ -156,7 +163,6 @@ class case:
                     proc.terminate()
         except:
             print('clean trex error')
-        #print('clean trex')
 
     def cleanGit(self):
         repo = Repo(self.handbook['du'])
