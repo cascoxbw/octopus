@@ -1,3 +1,4 @@
+import xml.etree.ElementTree as ET
 import os
 import shutil
 from git import Repo
@@ -36,7 +37,7 @@ class case:
         self.trexKw = (self.handbook['trex'],'./t-rex-64 -i','./trex-console','stop','quit','_t-rex-64')
 
     def getInputPath(self):
-        return os.path.join(self.handbook['input'],self.platform,self.name,self.algo)
+        return os.path.join(self.handbook['input'],self.platform,self.name)
 
     def getOutputPath(self):
         return os.path.join(self.handbook['output'],self.platform,self.name,self.algo,u.timestamp())
@@ -92,23 +93,38 @@ class case:
         self.result = (True,'pass') if cond else (False,'fail')
 
     def output(self):
-        path = self.getOutputPath()
-        print('output to:', path)
+        dst = self.getOutputPath()
+        print('output to:', dst)
         try:
-            os.makedirs(path)
-            shutil.move(os.path.join(self.uesimKw[0],self.uesimKw[3]), path)
-            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[5]), path)
-            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[6]), path)
+            os.makedirs(dst)
+            shutil.move(os.path.join(self.uesimKw[0],self.uesimKw[3]), dst)
+            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[5]), dst)
+            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[6]), dst)
         except:
             print('output error')
 
-    def input(self):
-        path = self.getInputPath()
-        print('input from:', path)
+    def injectAlgo(self):
+        idMap = {'su':'0','zfs':'1','bfs':'2','cus':'3'}
+        dst = os.path.join(self.l2Kw[0],self.l2Kw[3])
         try:
-            shutil.copy2(os.path.join(path, self.uesimKw[2]), self.uesimKw[0])
-            shutil.copy2(os.path.join(path, self.l2Kw[3]), self.l2Kw[0])
-            shutil.copy2(os.path.join(path, self.l2Kw[4]), self.l2Kw[0])
+            tree = ET.parse(dst)
+            root = tree.getroot()
+            for algo in root.iter('nMimoMode'):
+                algo.text = idMap[self.algo]
+            tree.write(dst)
+        except Exception as e:
+            print('inject algo error:',e)
+    
+    def inject(self):
+        self.injectAlgo()
+
+    def input(self):
+        src = self.getInputPath()
+        print('input from:', src)
+        try:
+            shutil.copy2(os.path.join(src, self.uesimKw[2]), self.uesimKw[0])
+            shutil.copy2(os.path.join(src, self.l2Kw[3]), self.l2Kw[0])
+            shutil.copy2(os.path.join(src, self.l2Kw[4]), self.l2Kw[0])
         except:
             print('input error')
 
@@ -155,6 +171,7 @@ class case:
 
         self.trexCnsl = console
         self.input()
+        self.inject()
         for i in range(0,self.retry+1):
             if i > 0:
                 u.fence('retry:',i,'/',self.retry)

@@ -57,16 +57,23 @@ class octopus:
         u.fence('total:',self.handbook['active_case_num'],'pass:',passCount,'fail:',failCount)
 
     def execute(self):
+        u.fence('octopus start')
+
         self.env()
         self.ht(self.handbook['ht'])
         console = None
         self.case_list[0].clean()
-        for case in self.case_list:
-            console = case.execute(console)
+        try:
+            for case in self.case_list:
+                console = case.execute(console)
+        except:
+            print('octopus error')
         self.case_list[-1].clean()
         self.check()
         if self.handbook['ht'] == False:
             self.ht(True)
+            
+        u.fence('octopus start')
 
 
 
