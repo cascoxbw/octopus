@@ -6,7 +6,7 @@ import pexpect
 import psutil
 from util import util as u
 
-class case:
+class tentacle:
     def __init__(self,id,handbook):
         self.handbook = handbook
         self.initProp(id)
@@ -132,14 +132,15 @@ class case:
         except:
             print('input error')
 
-    def cleanDu(self):
-        try:        
-            # rm = [os.path.join(self.uesimKw[0],self.uesimKw[3]),
-            #       os.path.join(self.l2Kw[0],self.l2Kw[5]),
-            #       os.path.join(self.l2Kw[0],self.l2Kw[6])]
-            # for i in rm:
-            #     if os.path.exists(i):
-            #         os.remove(i)
+    def cleanDu(self,rm):
+        try:
+            if rm:
+                rms = [os.path.join(self.uesimKw[0],self.uesimKw[3]),
+                       os.path.join(self.l2Kw[0],self.l2Kw[5]),
+                       os.path.join(self.l2Kw[0],self.l2Kw[6])]
+                for i in rms:
+                    if os.path.exists(i):
+                        os.remove(i)
         
             for proc in psutil.process_iter():
                 pname = proc.name()
@@ -171,7 +172,7 @@ class case:
         repo.index.checkout(os.path.join(self.l2Kw[0], self.l2Kw[4]), force=True)
     
     def clean(self):
-        self.cleanDu()
+        self.cleanDu(True)
         self.cleanTrex()
         self.cleanGit()
 
@@ -191,7 +192,7 @@ class case:
             self.du(False)
             self.trex(False)
             self.check()
-            self.cleanDu()
+            self.cleanDu(False)
             if self.result[0]:
                 self.output()
                 break

@@ -1,6 +1,6 @@
 from handbook import handbook
 from util import util as u
-from case import case
+from tentacle import tentacle
 
 class octopus:
     def __init__(self):
@@ -35,9 +35,9 @@ class octopus:
 
     def load(self):
         if self.handbook['is_flex']:
-            return [case(id,self.handbook) for id in self.handbook['flex']]
+            return [tentacle(id,self.handbook) for id in self.handbook['flex']]
         else:
-            return [case(id,self.handbook) for id in range(0,self.handbook['active_case_num'])]
+            return [tentacle(id,self.handbook) for id in range(0,self.handbook['active_case_num'])]
 
     def check(self):
         u.fence('summary')
