@@ -73,7 +73,7 @@ class octopus:
         if self.handbook['ht'] == False:
             self.ht(True)
             
-        u.fence('octopus start')
+        u.fence('octopus end')
 
 
 
