@@ -26,15 +26,15 @@ class tentacle:
         self.intervalDu = 15
         self.intervalTrex = 30
         self.intervalCmd = 5
-        self.intervalCase = 30
+        self.intervalCase = self.handbook['duration']
         self.retry = self.handbook['retry']
         self.result = (False,'fail')
         self.trexCnsl = None
 
     def initKw(self):
-        self.uesimKw = (self.handbook['uesim'],'./uesim.sh','uesimcfg.xml','uesimlog.txt','uesim')
-        self.l2Kw = (self.handbook['nr5g'],'./l2.sh','./stopdu.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
-        self.trexKw = (self.handbook['trex'],'./t-rex-64 -i','./trex-console','stop','quit','flow.py','_t-rex-64')
+        self.uesimKw = (self.handbook['uesim'],'uesim.sh','uesimcfg.xml','uesimlog.txt','uesim')
+        self.l2Kw = (self.handbook['nr5g'],'l2.sh','stopdu.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
+        self.trexKw = (self.handbook['trex'],'t-rex-64','trex-console','stop','quit','flow.py','_t-rex-64')
 
     def getInputPath(self):
         return os.path.join(self.handbook['input'],self.platform,self.name)
@@ -45,13 +45,13 @@ class tentacle:
     def uesim(self):
         print('[uesim start]')
         cd = u.cd(self.uesimKw[0])
-        cmd = f'nohup {self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &'
+        cmd = f'nohup ./{self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &'
         u.execute(cd,cmd)
     
     def l2(self):
         print('[l2 start]')
         cd = u.cd(self.l2Kw[0])
-        cmd = f'nohup {self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &'
+        cmd = f'nohup ./{self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &'
         u.execute(cd,cmd)
 
     def du(self,on):
@@ -63,16 +63,19 @@ class tentacle:
         else:
             print('[du stop]')
             cd = u.cd(self.l2Kw[0])
-            cmd = f'{self.l2Kw[2]} &> /dev/null'
+            cmd = f'./{self.l2Kw[2]} &> /dev/null'
             u.execute(cd,cmd)
 
     def trex(self,on):
         if on:
             if self.trexCnsl is None:
-                os.chdir(self.trexKw[0])
-                os.system(f'{self.trexKw[1]} > null.log 2>&1 &')
+                cd = u.cd(self.trexKw[0])
+                cmd = f'nohup ./{self.trexKw[1]} -i &> /dev/null'
+                u.execute(cd,cmd)
                 u.sleep(self.intervalTrex)
-                self.trexCnsl = pexpect.spawn(self.trexKw[2])
+                os.chdir(self.trexKw[0])
+                cmd = f'./{self.trexKw[2]}'
+                self.trexCnsl = pexpect.spawn(cmd)
                 u.sleep(self.intervalCmd)
 
             script = os.path.join(self.getInputPath(),self.trexKw[5])

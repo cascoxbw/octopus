@@ -45,6 +45,8 @@ class handbook:
 
             handbook['ht'] = self.cp.getboolean('case', 'ht')
 
+            handbook['duration'] = self.cp.getint('case', 'duration')
+
             return handbook
         except:
             print('load handbook error')
