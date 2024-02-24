@@ -35,6 +35,10 @@ class tentacle:
         self.uesimKw = (self.handbook['uesim'],'uesim.sh','uesimcfg.xml','uesimlog.txt','uesim')
         self.l2Kw = (self.handbook['nr5g'],'l2.sh','stopdu.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
         self.trexKw = (self.handbook['trex'],'t-rex-64','trex-console','stop','quit','flow.py','_t-rex-64')
+        
+        self.uesimlog = os.path.join(self.uesimKw[0],self.uesimKw[3])
+        self.l2log = os.path.join(self.l2Kw[0],self.l2Kw[5])
+        self.l2stats = os.path.join(self.l2Kw[0],self.l2Kw[6])
 
     def getInputPath(self):
         return os.path.join(self.handbook['input'],self.platform,self.name)
@@ -82,9 +86,7 @@ class tentacle:
             print('[trex stop]')
 
     def check(self):
-        cond = os.path.exists(os.path.join(self.uesimKw[0],self.uesimKw[3]))\
-               and os.path.exists(os.path.join(self.l2Kw[0],self.l2Kw[5]))\
-               and os.path.exists(os.path.join(self.l2Kw[0],self.l2Kw[6]))
+        cond = os.path.exists(self.uesimlog) and os.path.exists(self.l2log) and os.path.exists(self.l2stats)
         self.result = (True,'pass') if cond else (False,'fail')
 
     def output(self):
@@ -92,9 +94,9 @@ class tentacle:
         print('output to:', dst)
         try:
             os.makedirs(dst)
-            shutil.move(os.path.join(self.uesimKw[0],self.uesimKw[3]), dst)
-            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[5]), dst)
-            shutil.move(os.path.join(self.l2Kw[0],self.l2Kw[6]), dst)
+            shutil.move(self.uesimlog, dst)
+            shutil.move(self.l2log, dst)
+            shutil.move(self.l2stats, dst)
         except:
             print('output error')
 
@@ -129,9 +131,7 @@ class tentacle:
     def cleanDu(self,rm):
         try:
             if rm:
-                rms = (os.path.join(self.uesimKw[0],self.uesimKw[3]),
-                       os.path.join(self.l2Kw[0],self.l2Kw[5]),
-                       os.path.join(self.l2Kw[0],self.l2Kw[6]))
+                rms = (self.uesimlog,self.l2log,self.l2stats)
                 for i in rms:
                     if os.path.exists(i):
                         os.remove(i)
