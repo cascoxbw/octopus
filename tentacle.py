@@ -44,15 +44,11 @@ class tentacle:
 
     def uesim(self):
         print('[uesim start]')
-        cd = u.cd(self.uesimKw[0])
-        cmd = f'nohup ./{self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &'
-        u.execute(cd,cmd)
+        u.execute(u.cd(self.uesimKw[0]),f'nohup ./{self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &')
     
     def l2(self):
         print('[l2 start]')
-        cd = u.cd(self.l2Kw[0])
-        cmd = f'nohup ./{self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &'
-        u.execute(cd,cmd)
+        u.execute(u.cd(self.l2Kw[0]),f'nohup ./{self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &')
 
     def du(self,on):
         if on:
@@ -62,20 +58,15 @@ class tentacle:
             u.sleep(self.intervalDu)
         else:
             print('[du stop]')
-            cd = u.cd(self.l2Kw[0])
-            cmd = f'./{self.l2Kw[2]} &> /dev/null'
-            u.execute(cd,cmd)
+            u.execute(u.cd(self.l2Kw[0]),f'./{self.l2Kw[2]} &> /dev/null')
 
     def trex(self,on):
         if on:
             if self.trexCnsl is None:
-                cd = u.cd(self.trexKw[0])
-                cmd = f'nohup ./{self.trexKw[1]} -i &> /dev/null'
-                u.execute(cd,cmd)
+                u.execute(u.cd(self.trexKw[0]),f'nohup ./{self.trexKw[1]} -i &> /dev/null')
                 u.sleep(self.intervalTrex)
                 os.chdir(self.trexKw[0])
-                cmd = f'./{self.trexKw[2]}'
-                self.trexCnsl = pexpect.spawn(cmd)
+                self.trexCnsl = pexpect.spawn(f'./{self.trexKw[2]}')
                 u.sleep(self.intervalCmd)
 
             script = os.path.join(self.getInputPath(),self.trexKw[5])
@@ -138,9 +129,9 @@ class tentacle:
     def cleanDu(self,rm):
         try:
             if rm:
-                rms = [os.path.join(self.uesimKw[0],self.uesimKw[3]),
+                rms = (os.path.join(self.uesimKw[0],self.uesimKw[3]),
                        os.path.join(self.l2Kw[0],self.l2Kw[5]),
-                       os.path.join(self.l2Kw[0],self.l2Kw[6])]
+                       os.path.join(self.l2Kw[0],self.l2Kw[6]))
                 for i in rms:
                     if os.path.exists(i):
                         os.remove(i)

@@ -6,7 +6,6 @@ class octopus:
     def __init__(self):
         self.handbook = handbook().get()
         self.case_list = self.load()
-        self.intervalCmd = 5
 
     # def platform(self):
     #     try:
@@ -24,14 +23,10 @@ class octopus:
         cmd = 'online' if on else 'offline'
         print(f'[ht {cmd}]')
         u.execute(f'./ht_onoffline.sh {cmd} &> /dev/null')
-        u.sleep(self.intervalCmd)
         
     def env(self):
         print('[env set]')
-        oneapi = u.source(self.handbook['oneapi'])
-        oneapiIn = f'{oneapi} &> /dev/null'
-        env = u.source(self.handbook['env'])
-        u.execute(oneapiIn,env)
+        u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.source(self.handbook['env']))
 
     def load(self):
         if self.handbook['is_flex']:

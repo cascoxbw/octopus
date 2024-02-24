@@ -9,14 +9,7 @@ class util:
         return 'source ' + path
     
     def execute(*args):
-        cmd = ''
-        for i in range(len(args)):
-            if i==0:
-                cmd += args[i]
-            else:
-                cmd += ';'+args[i]
-        #print(cmd)
-        subprocess.Popen(['bash', '-c', f'{cmd}'])
+        subprocess.Popen(['bash','-c',';'.join(args)])
 
     def sleep(interval):
         time.sleep(interval)
