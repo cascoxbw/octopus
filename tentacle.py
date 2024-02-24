@@ -40,6 +40,10 @@ class tentacle:
         self.l2log = os.path.join(self.l2Kw[0],self.l2Kw[5])
         self.l2stats = os.path.join(self.l2Kw[0],self.l2Kw[6])
 
+        self.uesimcfg = os.path.join(self.uesimKw[0], self.uesimKw[2])
+        self.l2cell = os.path.join(self.l2Kw[0], self.l2Kw[3])
+        self.l2cfg = os.path.join(self.l2Kw[0], self.l2Kw[4])
+
     def getInputPath(self):
         return os.path.join(self.handbook['input'],self.platform,self.name)
 
@@ -103,15 +107,14 @@ class tentacle:
     def injectAlgo(self):
         idMap = {'su':'0','zfs':'1','bfs':'2','cus':'3'}
         # subbandMap = {'su':'1','zfs':'3','bfs':'1','cus':'1'}
-        dst = os.path.join(self.l2Kw[0],self.l2Kw[3])
         try:
-            tree = ET.parse(dst)
+            tree = ET.parse(self.l2cell)
             root = tree.getroot()
             for algo in root.iter('nMimoMode'):
                 algo.text = idMap[self.algo]
             # for sb in root.iter('nSubBand'):
             #     sb.text = subbandMap[self.algo]
-            tree.write(dst)
+            tree.write(self.l2cell)
         except Exception as e:
             print('inject algo error:',e)
     
@@ -161,9 +164,9 @@ class tentacle:
 
     def cleanGit(self):
         repo = Repo(self.handbook['du'])
-        repo.index.checkout(os.path.join(self.uesimKw[0], self.uesimKw[2]), force=True)
-        repo.index.checkout(os.path.join(self.l2Kw[0], self.l2Kw[3]), force=True)
-        repo.index.checkout(os.path.join(self.l2Kw[0], self.l2Kw[4]), force=True)
+        repo.index.checkout(self.uesimcfg, force=True)
+        repo.index.checkout(self.l2cell, force=True)
+        repo.index.checkout(self.l2cfg, force=True)
     
     def clean(self):
         self.cleanDu(True)
