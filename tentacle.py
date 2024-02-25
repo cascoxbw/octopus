@@ -126,13 +126,13 @@ class tentacle:
             tree = ET.parse(self.l2cell)
             root = tree.getroot()
             for am in root.iter('enableRlcAm'):
-                am.text = '1' if self.am else '0'
+                am.text = str(int(self.am))
             tree.write(self.l2cell)
 
             tree = ET.parse(self.uesimcfg)
             root = tree.getroot()
             for am in root.iter('enableRlcAm'):
-                am.text = '1' if self.am else '0'
+                am.text = str(int(self.am))
             tree.write(self.uesimcfg)
         except Exception as e:
             print('inject am error:',e)

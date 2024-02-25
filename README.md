@@ -2,8 +2,7 @@
 for mu benchmark
 
 requirements:
-    GitPython
+    GitPython(pip install GitPython)
 
-1. pip install GitPython
-2. modify handbook.ini
-3. python octopus.py
+1. modify handbook.ini
+2. python octopus.py
