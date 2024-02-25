@@ -37,8 +37,9 @@ class octopus:
     def check(self):
         u.fence('summary')
         print('platform:',self.handbook['platform'])
-        if self.handbook['is_global_algo']:
+        if self.handbook['is_global']:
             print('global algo:',self.handbook['global_algo'])
+            print('global am:',self.handbook['global_am'])
 
         passCount = 0
         failCount = 0

@@ -27,7 +27,8 @@ class handbook:
             
             handbook['case_list'] = [{'name':self.cp['case.'+str(i)]['name'],
                                       'trex_script_para':[para for para in self.cp['case.'+str(i)]['trex_script_para'].split(',')],
-                                      'algo':self.cp['case.'+str(i)]['dl_algo']} 
+                                      'algo':self.cp['case.'+str(i)]['dl_algo'],
+                                      'am':self.cp.getboolean('case.'+str(i),'am')} 
                                       for i in range(0,case_num)]
             
             handbook['platform'] = self.cp['case']['platform']
@@ -36,10 +37,11 @@ class handbook:
             if handbook['is_flex']:
                 handbook['flex'] = [int(id) for id in self.cp['case.flex']['id'].split(',')]
                 handbook['active_case_num'] = len(handbook['flex'])
-
-            handbook['is_global_algo'] = self.cp.getboolean('case.algo', 'enable')
-            if handbook['is_global_algo']:
-                handbook['global_algo'] = self.cp['case.algo']['dl']
+            
+            handbook['is_global'] = self.cp.getboolean('case.global', 'enable')
+            if handbook['is_global']:
+                handbook['global_algo'] = self.cp['case.global']['dl_algo']
+                handbook['global_am'] = self.cp.getboolean('case.global','am')
 
             handbook['retry'] = self.cp.getint('case', 'retry_num')
 

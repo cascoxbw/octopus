@@ -19,9 +19,11 @@ class tentacle:
         self.name = self.handbook['case_list'][self.id]['name']
         self.trex_script_para = self.handbook['case_list'][self.id]['trex_script_para']
         self.algo = self.handbook['case_list'][self.id]['algo']
-        if self.handbook['is_global_algo']:
+        self.am = self.handbook['case_list'][self.id]['am']
+        if self.handbook['is_global']:
             self.algo = self.handbook['global_algo']
-    
+            self.am = self.handbook['global_am']
+
     def initCtrl(self):
         self.intervalDu = 15
         self.intervalTrex = 30
@@ -48,7 +50,8 @@ class tentacle:
         return os.path.join(self.handbook['input'],self.platform,self.name)
 
     def getOutputPath(self):
-        return os.path.join(self.handbook['output'],self.platform,self.name,self.algo,u.timestamp())
+        injectFolder = self.algo + '_' + ('am' if self.am else 'um')
+        return os.path.join(self.handbook['output'],self.platform,self.name,injectFolder,u.timestamp())
 
     def uesim(self):
         print('[uesim start]')
@@ -118,8 +121,25 @@ class tentacle:
         except Exception as e:
             print('inject algo error:',e)
     
+    def injectAm(self):
+        try:
+            tree = ET.parse(self.l2cell)
+            root = tree.getroot()
+            for am in root.iter('enableRlcAm'):
+                am.text = '1' if self.am else '0'
+            tree.write(self.l2cell)
+
+            tree = ET.parse(self.uesimcfg)
+            root = tree.getroot()
+            for am in root.iter('enableRlcAm'):
+                am.text = '1' if self.am else '0'
+            tree.write(self.uesimcfg)
+        except Exception as e:
+            print('inject am error:',e)
+
     def inject(self):
         self.injectAlgo()
+        self.injectAm()
 
     def input(self):
         src = self.getInputPath()
@@ -176,6 +196,7 @@ class tentacle:
     def execute(self,console):
         u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['active_case_num'])
         print('algo:',self.algo)
+        print('am:',self.am)
 
         self.trexCnsl = console
         self.input()
