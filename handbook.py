@@ -50,8 +50,9 @@ class handbook:
             handbook['duration'] = self.cp.getint('case', 'duration')
 
             return handbook
-        except:
-            print('load handbook error')
+        except Exception as e:
+            print('load handbook error:',e)
+            exit()
 
     def get(self):
         #print(self.handbook)
