@@ -108,15 +108,15 @@ class tentacle:
             print('output error')
 
     def injectAlgo(self):
-        idMap = {'su':'0','zfs':'1','bfs':'2','cus':'3'}
-        # subbandMap = {'su':'1','zfs':'3','bfs':'1','cus':'1'}
+        idMap = {'zfs':'1','bfs':'2','cus':'3'}
+        subbandMap = {'zfs':'3','bfs':'18','cus':'18'}
         try:
             tree = ET.parse(self.l2cell)
             root = tree.getroot()
             for algo in root.iter('nMimoMode'):
                 algo.text = idMap[self.algo]
-            # for sb in root.iter('nSubBand'):
-            #     sb.text = subbandMap[self.algo]
+            for sb in root.iter('nSubBand'):
+                sb.text = subbandMap[self.algo]
             tree.write(self.l2cell)
         except Exception as e:
             print('inject algo error:',e)
