@@ -84,7 +84,7 @@ class tentacle:
             for para in self.trex_script_para:
                 cmd = f'start -f {script} {para}'
                 self.trexCnsl.sendline(cmd)
-                print('trex para:',cmd)
+                print('trex script:',cmd)
                 u.sleep(self.intervalCmd)
             print('[trex start]')
         else:

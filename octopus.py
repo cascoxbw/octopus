@@ -48,7 +48,7 @@ class octopus:
                 passCount+=1
             else:
                 failCount+=1
-            print(f'{case.name}: {case.result[1]}')
+            print(f'id: {case.id}, name: {case.name} -> {case.result[1]}')
         
         u.fence('total:',self.handbook['active_case_num'],'pass:',passCount,'fail:',failCount)
 
