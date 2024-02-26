@@ -183,11 +183,14 @@ class tentacle:
             print('clean trex error')
 
     def cleanGit(self):
-        repo = Repo(self.handbook['du'])
-        repo.index.checkout(self.uesimcfg, force=True)
-        repo.index.checkout(self.l2cell, force=True)
-        repo.index.checkout(self.l2cfg, force=True)
-    
+        try:
+            repo = Repo(self.handbook['du'])
+            repo.index.checkout(self.uesimcfg, force=True)
+            repo.index.checkout(self.l2cell, force=True)
+            repo.index.checkout(self.l2cfg, force=True)
+        except:
+            print('clean git error')
+        
     def clean(self):
         self.cleanDu(True)
         self.cleanTrex()
