@@ -108,8 +108,8 @@ class tentacle:
             print('output error')
 
     def injectAlgo(self):
-        idMap = {'zfs':'1','bfs':'2','cus':'3'}
-        subbandMap = {'zfs':'3','bfs':'18','cus':'18'}
+        idMap = {'su':'0','zfs':'1','bfs':'2','cus':'3'}
+        subbandMap = {'su':'3','zfs':'3','bfs':'18','cus':'18'}
         try:
             tree = ET.parse(self.l2cell)
             root = tree.getroot()
