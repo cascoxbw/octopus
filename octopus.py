@@ -63,7 +63,7 @@ class octopus:
             for case in self.case_list:
                 console = case.execute(console)
         except:
-            print('octopus error')
+            print('case execute error')
         self.case_list[-1].clean()
         self.check()
         if self.handbook['ht'] == False:
