@@ -1,8 +1,9 @@
 # octopus
 for mu benchmark
 
-requirements:
-    GitPython(pip install GitPython)
+## environment
+- **libs: psutil and GitPython （pip install psutil GitPython）**
 
-1. modify handbook.ini
+## run script
+1. modify 'handbook.ini' according to your needs
 2. python octopus.py
