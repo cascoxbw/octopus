@@ -14,3 +14,7 @@
 
 - modify 'handbook.ini' according to your needs
 - python octopus.py
+
+## Authors <a name = "authors"></a>
+
+- bowen
