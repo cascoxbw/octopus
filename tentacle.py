@@ -55,11 +55,11 @@ class tentacle:
 
     def uesim(self):
         print('[uesim start]')
-        u.execute(u.cd(self.uesimKw[0]),f'nohup ./{self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &')
+        u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.cd(self.uesimKw[0]),f'nohup ./{self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &')
     
     def l2(self):
         print('[l2 start]')
-        u.execute(u.cd(self.l2Kw[0]),f'nohup ./{self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &')
+        u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.cd(self.l2Kw[0]),f'nohup ./{self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &')
 
     def du(self,on):
         if on:

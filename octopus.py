@@ -24,9 +24,9 @@ class octopus:
         print(f'[ht {cmd}]')
         u.execute(f'./ht_onoffline.sh {cmd} &> /dev/null')
         
-    def env(self):
-        print('[env set]')
-        u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.source(self.handbook['env']))
+    # def env(self):
+    #     print('[env set]')
+    #     u.execute(u.source(self.handbook['env']))
 
     def load(self):
         if self.handbook['is_flex']:
@@ -55,7 +55,6 @@ class octopus:
     def execute(self):
         u.fence('octopus start')
 
-        self.env()
         self.ht(self.handbook['ht'])
         console = None
         self.case_list[0].clean()
