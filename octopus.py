@@ -6,18 +6,6 @@ class octopus:
     def __init__(self):
         self.handbook = handbook().get()
         self.case_list = self.load()
-
-    # def platform(self):
-    #     try:
-    #         with open(self.handbook['env'], 'r') as file:
-    #             if 'spr' in file.read():
-    #                 plat = 'SPR-EE'
-    #             else:
-    #                 plat = 'ICX-SP'
-    #         print('platform:',plat)
-    #         return plat
-    #     except:
-    #         print('platform error')
     
     def ht(self,on):
         cmd = 'online' if on else 'offline'

@@ -12,7 +12,6 @@ class handbook:
 
             handbook = {}
             handbook['oneapi'] = self.cp['path']['oneapi']
-            # handbook['env'] = self.cp['path']['env']
             handbook['trex'] = self.cp['path']['trex']
 
             handbook['du'] = self.cp['path']['du']
