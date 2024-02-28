@@ -23,10 +23,6 @@ class octopus:
         cmd = 'online' if on else 'offline'
         print(f'[ht {cmd}]')
         u.execute(f'./ht_onoffline.sh {cmd} &> /dev/null')
-        
-    # def env(self):
-    #     print('[env set]')
-    #     u.execute(u.source(self.handbook['env']))
 
     def load(self):
         if self.handbook['is_flex']:
