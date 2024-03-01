@@ -56,20 +56,21 @@ class tentacle:
     def uesim(self):
         print('[uesim start]')
         u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.cd(self.uesimKw[0]),f'nohup ./{self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &')
+        u.sleep(self.intervalDu)
     
     def l2(self):
         print('[l2 start]')
         u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.cd(self.l2Kw[0]),f'nohup ./{self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &')
+        u.sleep(self.intervalDu)
 
     def du(self,on):
         if on:
             self.uesim()
-            u.sleep(self.intervalDu)
             self.l2()
-            u.sleep(self.intervalDu)
         else:
             print('[du stop]')
             u.execute(u.cd(self.l2Kw[0]),f'./{self.l2Kw[2]} &> /dev/null')
+            u.sleep(self.intervalCmd)
 
     def trex(self,on):
         if self.handbook['has_trex']:
@@ -92,8 +93,6 @@ class tentacle:
                 self.trexCnsl.sendline(self.trexKw[3])
                 u.sleep(self.intervalCmd)
                 print('[trex stop]')
-        else:
-            u.sleep(self.intervalCmd)
 
     def check(self):
         cond = os.path.exists(self.uesimlog) and os.path.exists(self.l2log) and os.path.exists(self.l2stats)
