@@ -72,25 +72,28 @@ class tentacle:
             u.execute(u.cd(self.l2Kw[0]),f'./{self.l2Kw[2]} &> /dev/null')
 
     def trex(self,on):
-        if on:
-            if self.trexCnsl is None:
-                u.execute(u.cd(self.trexKw[0]),f'nohup ./{self.trexKw[1]} -i &> /dev/null')
-                u.sleep(self.intervalTrex)
-                os.chdir(self.trexKw[0])
-                self.trexCnsl = pexpect.spawn(f'./{self.trexKw[2]}')
-                u.sleep(self.intervalCmd)
+        if self.handbook['has_trex']:
+            if on:
+                if self.trexCnsl is None:
+                    u.execute(u.cd(self.trexKw[0]),f'nohup ./{self.trexKw[1]} -i &> /dev/null')
+                    u.sleep(self.intervalTrex)
+                    os.chdir(self.trexKw[0])
+                    self.trexCnsl = pexpect.spawn(f'./{self.trexKw[2]}')
+                    u.sleep(self.intervalCmd)
 
-            script = os.path.join(self.getInputPath(),self.trexKw[5])
-            for para in self.trex_script_para:
-                cmd = f'start -f {script} {para}'
-                self.trexCnsl.sendline(cmd)
-                print('trex script:',cmd)
+                script = os.path.join(self.getInputPath(),self.trexKw[5])
+                for para in self.trex_script_para:
+                    cmd = f'start -f {script} {para}'
+                    self.trexCnsl.sendline(cmd)
+                    print('trex script:',cmd)
+                    u.sleep(self.intervalCmd)
+                print('[trex start]')
+            else:
+                self.trexCnsl.sendline(self.trexKw[3])
                 u.sleep(self.intervalCmd)
-            print('[trex start]')
+                print('[trex stop]')
         else:
-            self.trexCnsl.sendline(self.trexKw[3])
             u.sleep(self.intervalCmd)
-            print('[trex stop]')
 
     def check(self):
         cond = os.path.exists(self.uesimlog) and os.path.exists(self.l2log) and os.path.exists(self.l2stats)

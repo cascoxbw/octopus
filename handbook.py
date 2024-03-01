@@ -48,6 +48,8 @@ class handbook:
 
             handbook['duration'] = self.cp.getint('case', 'duration')
 
+            handbook['has_trex'] = self.cp.getboolean('case', 'has_trex')
+
             return handbook
         except Exception as e:
             print('load handbook error:',e)

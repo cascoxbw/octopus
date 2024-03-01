@@ -45,12 +45,11 @@ class octopus:
         try:
             for case in self.case_list:
                 console = case.execute(console)
-        except:
-            print('case execute error')
+        except Exception as e:
+            print('case execute error:',e)
         self.case_list[-1].clean()
         self.check()
-        if self.handbook['ht'] == False:
-            self.ht(True)
+        self.ht(True)
             
         u.fence('octopus end')
 
