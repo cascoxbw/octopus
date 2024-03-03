@@ -94,9 +94,26 @@ class tentacle:
                 u.sleep(self.intervalCmd)
                 print('[trex stop]')
 
+    def checkExist(self):
+        return os.path.exists(self.uesimlog) and os.path.exists(self.l2log) and os.path.exists(self.l2stats)
+    
+    def checkValid(self):
+        try:
+            with open(self.l2stats, 'r') as file:
+                for line in file:
+                    if 'LV1_MAC_SCHEDULER' in line:
+                        if line.count('0/0') == 3:
+                            return False
+                        else:
+                            return True
+        except:
+            return False
+    
     def check(self):
-        cond = os.path.exists(self.uesimlog) and os.path.exists(self.l2log) and os.path.exists(self.l2stats)
-        self.result = (True,'pass') if cond else (False,'fail')
+        isPass = self.checkExist()
+        if isPass:
+            isPass = self.checkValid()
+        self.result = (True,'pass') if isPass else (False,'fail')
 
     def output(self):
         dst = self.getOutputPath()
