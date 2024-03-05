@@ -5,7 +5,6 @@ from git import Repo
 import pexpect
 import psutil
 from util import util as u
-import re
 
 class tentacle:
     def __init__(self,id,handbook):
