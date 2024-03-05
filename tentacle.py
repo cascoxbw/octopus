@@ -5,6 +5,7 @@ from git import Repo
 import pexpect
 import psutil
 from util import util as u
+import re
 
 class tentacle:
     def __init__(self,id,handbook):
@@ -126,39 +127,55 @@ class tentacle:
         except:
             print('output error')
 
-    def injectAlgo(self):
+    def injectAlgo(self, treeL2Cell):
         idMap = {'su':'0','zfs':'1','bfs':'2','cus':'3'}
         subbandMap = {'su':'3','zfs':'3','bfs':'18','cus':'18'}
-        try:
-            tree = ET.parse(self.l2cell)
-            root = tree.getroot()
-            for algo in root.iter('nMimoMode'):
-                algo.text = idMap[self.algo]
-            for sb in root.iter('nSubBand'):
-                sb.text = subbandMap[self.algo]
-            tree.write(self.l2cell)
-        except Exception as e:
-            print('inject algo error:',e)
-    
-    def injectAm(self):
-        try:
-            tree = ET.parse(self.l2cell)
-            root = tree.getroot()
-            for am in root.iter('enableRlcAm'):
-                am.text = str(int(self.am))
-            tree.write(self.l2cell)
 
-            tree = ET.parse(self.uesimcfg)
-            root = tree.getroot()
-            for am in root.iter('enableRlcAm'):
-                am.text = str(int(self.am))
-            tree.write(self.uesimcfg)
-        except Exception as e:
-            print('inject am error:',e)
+        root = treeL2Cell.getroot()
+        for algo in root.iter('nMimoMode'):
+            algo.text = idMap[self.algo]
+        for sb in root.iter('nSubBand'):
+            sb.text = subbandMap[self.algo]
+
+    def injectAm(self,treeL2Cell,treeUesimcfg):
+        root = treeL2Cell.getroot()
+        for am in root.iter('enableRlcAm'):
+            am.text = str(int(self.am))
+        root = treeUesimcfg.getroot()
+        for am in root.iter('enableRlcAm'):
+            am.text = str(int(self.am))
+
+    def injectIp(self,treeUesimcfg):
+        root = treeUesimcfg.getroot()
+        for ip in root.iter('portAddr0'):
+            ip0 = ip.text
+        for ip in root.iter('portAddr1'):
+            ip1 = ip.text
+
+        with open(os.path.join(self.uesimKw[0], 'dpdk.sh'), 'r+') as file:
+            lines = file.readlines()
+            for i,line in enumerate(lines):
+                if 'ethDevice0=' in line:
+                    lines[i] = 'ethDevice0=' + ip0 + '\n'
+                if 'ethDevice1=' in line:
+                    lines[i] = 'ethDevice1=' + ip1 + '\n'
+            file.seek(0)
+            file.writelines(lines)
 
     def inject(self):
-        self.injectAlgo()
-        self.injectAm()
+        try:
+            treeL2Cell = ET.parse(self.l2cell)
+            treeUesimcfg = ET.parse(self.uesimcfg)
+            
+            self.injectAlgo(treeL2Cell)
+            self.injectAm(treeL2Cell,treeUesimcfg)
+            self.injectIp(treeUesimcfg)
+
+            treeL2Cell.write(self.l2cell)
+            treeUesimcfg.write(self.uesimcfg)
+
+        except Exception as e:
+            print('inject error:',e)
 
     def input(self):
         src = self.getInputPath()
