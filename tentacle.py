@@ -156,23 +156,31 @@ class tentacle:
             for i,line in enumerate(lines):
                 if 'ethDevice0=' in line:
                     lines[i] = 'ethDevice0=' + ip0 + '\n'
-                if 'ethDevice1=' in line:
+                elif 'ethDevice1=' in line:
                     lines[i] = 'ethDevice1=' + ip1 + '\n'
+                    break
             file.seek(0)
             file.writelines(lines)
+
+    def injectDsa(self,treeL2cfg):
+        root = treeL2cfg.getroot()
+        for dsa in root.iter('enableDSA'):
+            dsa.text = str(int(self.handbook['dsa']))
 
     def inject(self):
         try:
             treeL2Cell = ET.parse(self.l2cell)
             treeUesimcfg = ET.parse(self.uesimcfg)
-            
+            treeL2cfg = ET.parse(self.l2cfg)
+
             self.injectAlgo(treeL2Cell)
             self.injectAm(treeL2Cell,treeUesimcfg)
             self.injectIp(treeUesimcfg)
+            self.injectDsa(treeL2cfg)
 
             treeL2Cell.write(self.l2cell)
             treeUesimcfg.write(self.uesimcfg)
-
+            treeL2cfg.write(self.l2cfg)
         except Exception as e:
             print('inject error:',e)
 

@@ -21,6 +21,8 @@ class octopus:
     def check(self):
         u.fence('summary')
         print('platform:',self.handbook['platform'])
+        print('dsa:',self.handbook['dsa'])
+
         if self.handbook['is_global']:
             print('global algo:',self.handbook['global_algo'])
             print('global am:',self.handbook['global_am'])

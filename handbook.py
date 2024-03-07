@@ -50,6 +50,8 @@ class handbook:
 
             handbook['has_trex'] = self.cp.getboolean('case', 'has_trex')
 
+            handbook['dsa'] = self.cp.getboolean('case', 'dsa')
+
             return handbook
         except Exception as e:
             print('load handbook error:',e)
