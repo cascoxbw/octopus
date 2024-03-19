@@ -183,6 +183,7 @@ class tentacle:
             treeL2cfg.write(self.l2cfg)
         except Exception as e:
             print('inject error:',e)
+            exit()
 
     def input(self):
         src = self.getInputPath()
@@ -252,6 +253,7 @@ class tentacle:
                 u.fence('retry:',i,'/',self.retry)
             self.du(True)
             self.trex(True)
+            print('duration:',self.intervalCase)
             u.sleep(self.intervalCase)
             self.du(False)
             self.trex(False)
