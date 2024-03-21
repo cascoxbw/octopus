@@ -12,7 +12,10 @@ class util:
         subprocess.Popen(['bash','-c',';'.join(args)])
 
     def sleep(interval):
-        time.sleep(interval)
+        try:
+            time.sleep(interval)
+        except KeyboardInterrupt:
+            raise Exception('ctrl + c')
 
     def timestamp():
         return time.strftime('%Y%m%d%H%M%S', time.localtime())
