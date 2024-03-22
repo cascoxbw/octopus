@@ -211,7 +211,7 @@ class tentacle:
             print('clean du error')
     
     def cleanTrex(self):
-        if self.trexCnsl != None:
+        if self.trexCnsl is not None:
             self.trexCnsl.sendline(self.trexKw[3])
             u.sleep(self.intervalCmd)
             self.trexCnsl.sendline(self.trexKw[4])
