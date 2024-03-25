@@ -43,13 +43,15 @@ class octopus:
 
         self.ht(self.handbook['ht'])
         console = None
-        self.case_list[0].clean()
+        cursor = 0
+        self.case_list[cursor].clean()
         try:
-            for case in self.case_list:
+            for i,case in enumerate(self.case_list):
+                cursor = i
                 console = case.execute(console)
         except Exception as e:
             print('case execute error:',e)
-        self.case_list[-1].clean()
+        self.case_list[cursor].clean()
         self.check()
         self.ht(True)
             
