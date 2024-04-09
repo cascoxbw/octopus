@@ -55,12 +55,12 @@ class tentacle:
 
     def uesim(self):
         print('[uesim start]')
-        u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.cd(self.uesimKw[0]),f'nohup ./{self.uesimKw[1]} > {self.uesimKw[3]} 2>&1 &')
+        u.execute(u.exeSilence(u.source(self.handbook['oneapi'])),u.cd(self.uesimKw[0]),u.nohup(u.exeNoise(u.exe(self.uesimKw[1]),self.uesimKw[3])))
         u.sleep(self.intervalDu)
     
     def l2(self):
         print('[l2 start]')
-        u.execute(f"{u.source(self.handbook['oneapi'])} &> /dev/null",u.cd(self.l2Kw[0]),f'nohup ./{self.l2Kw[1]} > {self.l2Kw[5]} 2>&1 &')
+        u.execute(u.exeSilence(u.source(self.handbook['oneapi'])),u.cd(self.l2Kw[0]),u.nohup(u.exeNoise(u.exe(self.l2Kw[1]),self.l2Kw[5])))
         u.sleep(self.intervalDu)
 
     def du(self,on):
@@ -69,17 +69,17 @@ class tentacle:
             self.l2()
         else:
             print('[du stop]')
-            u.execute(u.cd(self.l2Kw[0]),f'./{self.l2Kw[2]} &> /dev/null')
+            u.execute(u.cd(self.l2Kw[0]),u.exeSilence(u.exe(self.l2Kw[2])))
             u.sleep(self.intervalCmd)
 
     def trex(self,on):
         if self.handbook['has_trex']:
             if on:
                 if self.trexCnsl is None:
-                    u.execute(u.cd(self.trexKw[0]),f'nohup ./{self.trexKw[1]} -i &> /dev/null')
+                    u.execute(u.cd(self.trexKw[0]),u.nohup(u.exeSilence(u.exe(self.trexKw[1]) + ' -i')))
                     u.sleep(self.intervalTrex)
                     os.chdir(self.trexKw[0])
-                    self.trexCnsl = pexpect.spawn(f'./{self.trexKw[2]}')
+                    self.trexCnsl = pexpect.spawn(u.exe(self.trexKw[2]))
                     u.sleep(self.intervalCmd)
 
                 script = os.path.join(self.getInputPath(),self.trexKw[5])
