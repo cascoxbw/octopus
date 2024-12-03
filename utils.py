@@ -1,7 +1,7 @@
 import subprocess
 import time
 
-class util:
+class utils:
     def cd(path):
         return 'cd ' + path
     
@@ -18,19 +18,19 @@ class util:
             raise Exception('ctrl + c')
 
     def timestamp():
-        return time.strftime('%Y%m%d%H%M%S', time.localtime())
+        return time.strftime('%Y%m%d_%H%M%S', time.localtime())
     
     def fence(*args):
         print((' '.join([str(i) for i in args])).center(90,'#'))
     
-    def exe(keyword):
-        return f'./{keyword}'
-    
-    def exeSilence(exe):
-        return f'{exe} &> /dev/null'
+    def exe(cmd):
+        return f'./{cmd}'
 
-    def exeNoise(exe,log):
-        return f'{exe} &> {log}'
+    def echo(exe,log=None):
+        if log is None:
+            return f'{exe} &> /dev/null'
+        else:
+            return f'{exe} &> {log}'
     
     def nohup(exe):
         return f'nohup {exe} &'

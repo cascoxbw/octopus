@@ -1,5 +1,5 @@
 from handbook import handbook
-from util import util as u
+from utils import utils as u
 from tentacle import tentacle
 
 class octopus:
@@ -7,10 +7,10 @@ class octopus:
         self.handbook = handbook().get()
         self.case_list = self.load()
     
-    def ht(self,on):
-        cmd = 'online' if on else 'offline'
-        print(f'[ht {cmd}]')
-        u.execute(f'./ht_onoffline.sh {cmd} &> /dev/null')
+    # def ht(self,on):
+    #     cmd = 'online' if on else 'offline'
+    #     print(f'[ht {cmd}]')
+    #     u.execute(f'./ht_onoffline.sh {cmd} &> /dev/null')
 
     def load(self):
         if self.handbook['is_flex']:
@@ -41,7 +41,7 @@ class octopus:
     def execute(self):
         u.fence('octopus start')
 
-        self.ht(self.handbook['ht'])
+        # self.ht(self.handbook['ht'])
         console = None
         cursor = 0
         self.case_list[cursor].clean()
@@ -53,7 +53,7 @@ class octopus:
             print('case execute error:',e)
         self.case_list[cursor].clean()
         self.check()
-        self.ht(True)
+        # self.ht(True)
             
         u.fence('octopus end')
 

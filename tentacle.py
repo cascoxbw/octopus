@@ -1,10 +1,11 @@
+import sys
 import xml.etree.ElementTree as ET
 import os
 import shutil
 from git import Repo
 import pexpect
 import psutil
-from util import util as u
+from utils import utils as u
 
 class tentacle:
     def __init__(self,id,handbook):
@@ -23,6 +24,7 @@ class tentacle:
         if self.handbook['is_global']:
             self.algo = self.handbook['global_algo']
             self.am = self.handbook['global_am']
+        self.group = self.handbook['case_list'][self.id]['group']
 
     def initCtrl(self):
         self.intervalDu = 15
@@ -35,32 +37,32 @@ class tentacle:
 
     def initKw(self):
         self.uesimKw = (self.handbook['uesim'],'uesim.sh','uesimcfg.xml','uesimlog.txt','uesim')
-        self.l2Kw = (self.handbook['nr5g'],'l2.sh','stopdu.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
-        self.trexKw = (self.handbook['trex'],'t-rex-64','trex-console','stop','quit','flow.py','_t-rex-64')
+        self.l2Kw = (self.handbook['nr5g'],'l2.sh','stop_du.sh','cell1.xml','maccfg.xml','l2log.txt','l23_timing_stats.txt','l2app')
+        self.trexKw = (self.handbook['trex'],'t-rex-64 -i','trex-console','stop','quit','flow.py','_t-rex-64')
         
         self.uesimlog = os.path.join(self.uesimKw[0],self.uesimKw[3])
         self.l2log = os.path.join(self.l2Kw[0],self.l2Kw[5])
         self.l2stats = os.path.join(self.l2Kw[0],self.l2Kw[6])
 
         self.uesimcfg = os.path.join(self.uesimKw[0], self.uesimKw[2])
-        self.l2cell = os.path.join(self.l2Kw[0], self.l2Kw[3])
-        self.l2cfg = os.path.join(self.l2Kw[0], self.l2Kw[4])
+        self.cellcfg = os.path.join(self.l2Kw[0], self.l2Kw[3])
+        self.maccfg = os.path.join(self.l2Kw[0], self.l2Kw[4])
 
     def getInputPath(self):
-        return os.path.join(self.handbook['input'],self.platform,self.name)
+        return os.path.join(self.handbook['input'],self.group,self.platform,self.name)
 
     def getOutputPath(self):
         injectFolder = self.algo + '_' + ('am' if self.am else 'um')
-        return os.path.join(self.handbook['output'],self.platform,self.name,injectFolder,u.timestamp())
+        return os.path.join(self.handbook['output'],self.group,self.platform,self.name,injectFolder,u.timestamp())
 
     def uesim(self):
         print('[uesim start]')
-        u.execute(u.exeSilence(u.source(self.handbook['oneapi'])),u.cd(self.uesimKw[0]),u.nohup(u.exeNoise(u.exe(self.uesimKw[1]),self.uesimKw[3])))
+        u.execute(u.echo(u.source(self.handbook['oneapi'])),u.source(self.handbook['PATH']),u.cd(self.uesimKw[0]),u.nohup(u.echo(u.exe(self.uesimKw[1]),self.uesimKw[3])))
         u.sleep(self.intervalDu)
     
     def l2(self):
         print('[l2 start]')
-        u.execute(u.exeSilence(u.source(self.handbook['oneapi'])),u.cd(self.l2Kw[0]),u.nohup(u.exeNoise(u.exe(self.l2Kw[1]),self.l2Kw[5])))
+        u.execute(u.echo(u.source(self.handbook['oneapi'])),u.source(self.handbook['PATH']),u.cd(self.l2Kw[0]),u.nohup(u.echo(u.exe(self.l2Kw[1]),self.l2Kw[5])))
         u.sleep(self.intervalDu)
 
     def du(self,on):
@@ -68,27 +70,27 @@ class tentacle:
             self.uesim()
             self.l2()
         else:
-            print('[du stop]')
-            u.execute(u.cd(self.l2Kw[0]),u.exeSilence(u.exe(self.l2Kw[2])))
+            print('[uesim/l2 stop]')
+            u.execute(u.cd(self.l2Kw[0]),u.echo(u.exe(self.l2Kw[2])))
             u.sleep(self.intervalCmd)
 
     def trex(self,on):
         if self.handbook['has_trex']:
             if on:
                 if self.trexCnsl is None:
-                    u.execute(u.cd(self.trexKw[0]),u.nohup(u.exeSilence(u.exe(self.trexKw[1]) + ' -i')))
+                    u.execute(u.cd(self.trexKw[0]),u.nohup(u.echo(u.exe(self.trexKw[1]))))
                     u.sleep(self.intervalTrex)
                     os.chdir(self.trexKw[0])
                     self.trexCnsl = pexpect.spawn(u.exe(self.trexKw[2]))
                     u.sleep(self.intervalCmd)
 
+                print('[trex start]')
                 script = os.path.join(self.getInputPath(),self.trexKw[5])
                 for para in self.trex_script_para:
                     cmd = f'start -f {script} {para}'
                     self.trexCnsl.sendline(cmd)
                     print('trex script:',cmd)
                     u.sleep(self.intervalCmd)
-                print('[trex start]')
             else:
                 self.trexCnsl.sendline(self.trexKw[3])
                 u.sleep(self.intervalCmd)
@@ -128,13 +130,13 @@ class tentacle:
 
     def injectAlgo(self, treeL2Cell):
         idMap = {'su':'0','zfs':'1','bfs':'2','cus':'3'}
-        subbandMap = {'su':'3','zfs':'3','bfs':'18','cus':'18'}
 
         root = treeL2Cell.getroot()
         for algo in root.iter('nMimoMode'):
             algo.text = idMap[self.algo]
-        for sb in root.iter('nSubBand'):
-            sb.text = subbandMap[self.algo]
+        if self.algo == 'zfs':
+            for sb in root.iter('nSubBand'):
+                sb.text = '3'
 
     def injectAm(self,treeL2Cell,treeUesimcfg):
         root = treeL2Cell.getroot()
@@ -169,21 +171,20 @@ class tentacle:
 
     def inject(self):
         try:
-            treeL2Cell = ET.parse(self.l2cell)
+            treeL2Cell = ET.parse(self.cellcfg)
             treeUesimcfg = ET.parse(self.uesimcfg)
-            treeL2cfg = ET.parse(self.l2cfg)
+            treeL2cfg = ET.parse(self.maccfg)
 
             self.injectAlgo(treeL2Cell)
             self.injectAm(treeL2Cell,treeUesimcfg)
             self.injectIp(treeUesimcfg)
             self.injectDsa(treeL2cfg)
 
-            treeL2Cell.write(self.l2cell)
+            treeL2Cell.write(self.cellcfg)
             treeUesimcfg.write(self.uesimcfg)
-            treeL2cfg.write(self.l2cfg)
+            treeL2cfg.write(self.maccfg)
         except Exception as e:
-            print('inject error:',e)
-            exit()
+            sys.exit(f'inject error:{e}')
 
     def input(self):
         src = self.getInputPath()
@@ -229,9 +230,9 @@ class tentacle:
     def cleanGit(self):
         try:
             repo = Repo(self.handbook['du'])
-            repo.index.checkout(self.uesimcfg, force=True)
-            repo.index.checkout(self.l2cell, force=True)
-            repo.index.checkout(self.l2cfg, force=True)
+            repo.git.checkout(self.uesimcfg)
+            repo.git.checkout(self.cellcfg)
+            repo.git.checkout(self.maccfg)
         except:
             print('clean git error')
         
@@ -242,8 +243,7 @@ class tentacle:
 
     def execute(self,console):
         u.fence('case:',self.name,'id:',self.id,'total:',self.handbook['active_case_num'])
-        print('algo:',self.algo)
-        print('am:',self.am)
+        print(' | '.join(['group: '+self.group,'algo: '+self.algo,'am: '+str(self.am)]))
 
         self.trexCnsl = console
         self.input()
@@ -253,7 +253,7 @@ class tentacle:
                 u.fence('retry:',i,'/',self.retry)
             self.du(True)
             self.trex(True)
-            print('duration:',self.intervalCase)
+            print(f'duration: {self.intervalCase} second')
             u.sleep(self.intervalCase)
             self.du(False)
             self.trex(False)

@@ -2,18 +2,17 @@
 
 ## About <a name = "about"></a>
 
-- for mu benchmark
+- for L2 benchmark
 
 ## Prerequisites <a name = "Prerequisites"></a>
 
-- psutil, GitPython
-
-- pip install psutil GitPython
+- pip install -r requirements.txt 
 
 ## Usage <a name = "usage"></a>
 
 - modify 'handbook.ini' according to your needs
-- python octopus.py
+- short term: python octopus.py
+- long term: nohup python tank.py &> run.log &
 
 ## Authors <a name = "authors"></a>
 

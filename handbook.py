@@ -1,4 +1,6 @@
 from configparser import ConfigParser, ExtendedInterpolation
+import os
+import sys
 
 class handbook:
     def __init__(self):
@@ -8,17 +10,22 @@ class handbook:
 
     def load(self):
         try:
-            self.cp.read(self.name)
+            # print(sys.path[0],os.path.dirname(__file__))
 
             handbook = {}
-            handbook['oneapi'] = self.cp['path']['oneapi']
-            handbook['trex'] = self.cp['path']['trex']
+            handbook['self'] = os.path.dirname(__file__)
+            handbook['du'] = os.path.abspath(os.path.join(handbook['self'],'../..'))
+            handbook['uesim'] = os.path.join(handbook['du'],'project/build/uesim/')
+            handbook['nr5g'] = os.path.join(handbook['du'],'project/build/nr5g/')
+            handbook['input'] = os.path.join(handbook['du'],'project/config/benchmark/')
+            handbook['output'] = os.path.join(handbook['self'],'output')
 
-            handbook['du'] = self.cp['path']['du']
-            handbook['uesim'] = self.cp['path']['uesim']
-            handbook['nr5g'] = self.cp['path']['nr5g']
-            handbook['input'] = self.cp['path']['input']
-            handbook['output'] = self.cp['path']['output']
+            self.cp.read(os.path.join(handbook['self'],self.name))
+            
+            handbook['oneapi'] = '/opt/intel/oneapi/setvars.sh'
+            handbook['PATH'] = self.cp['env']['PATH']
+            handbook['trex'] = self.cp['env']['trex']
+            handbook['has_trex'] = os.path.exists(handbook['trex'])
 
             case_num = self.cp.getint('case', 'case_num')
             handbook['case_num'] = case_num
@@ -26,8 +33,9 @@ class handbook:
             
             handbook['case_list'] = [{'name':self.cp['case.'+str(i)]['name'],
                                       'trex_script_para':[para for para in self.cp['case.'+str(i)]['trex_script_para'].split(',')],
-                                      'algo':self.cp['case.'+str(i)]['dl_algo'],
-                                      'am':self.cp.getboolean('case.'+str(i),'am')} 
+                                      'algo':self.cp['case.'+str(i)]['dl_algo'] if 'dl_algo' in self.cp['case.'+str(i)] else 'su',
+                                      'am':self.cp.getboolean('case.'+str(i),'am'),
+                                      'group':self.cp['case.'+str(i)]['group']} 
                                       for i in range(0,case_num)]
             
             handbook['platform'] = self.cp['case']['platform']
@@ -42,22 +50,18 @@ class handbook:
                 handbook['global_algo'] = self.cp['case.global']['dl_algo']
                 handbook['global_am'] = self.cp.getboolean('case.global','am')
 
-            handbook['retry'] = self.cp.getint('case', 'retry_num')
+            handbook['retry'] = 0 #self.cp.getint('case', 'retry_num')
 
-            handbook['ht'] = self.cp.getboolean('case', 'ht')
+            # handbook['ht'] = self.cp.getboolean('case', 'ht')
 
             handbook['duration'] = self.cp.getint('case', 'duration')
-
-            handbook['has_trex'] = self.cp.getboolean('case', 'has_trex')
 
             handbook['dsa'] = self.cp.getboolean('case', 'dsa')
 
             return handbook
         except Exception as e:
-            print('load handbook error:',e)
-            exit()
+            sys.exit(f'load handbook error:{e}')
 
     def get(self):
-        #print(self.handbook)
+        # print(self.handbook)
         return self.handbook
-
